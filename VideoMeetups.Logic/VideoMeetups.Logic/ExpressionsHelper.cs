@@ -10,12 +10,17 @@ namespace VideoMeetups.Logic
         {
             var visitor = new GenericCallExpressionVisitor(targetType, replacementType);
 
-            return Expression.Lambda(visitor.Visit(callMethod.Body), callMethod.Parameters);
+            return (LambdaExpression)visitor.Visit(callMethod);
         }
 
         public static Expression<Func<TParam, TResult>> ChangeGenericParam<TParam, TResult>(this Expression<Func<TParam, TResult>> callMethod, Type targetType, Type replacementType)
         {
             return (Expression<Func<TParam, TResult>>)ToGenericCall((LambdaExpression)callMethod, targetType, replacementType);
+        }
+
+        public static Expression<Func<TParam1, TParam2, TResult>> ChangeGenericParam<TParam1, TParam2, TResult>(this Expression<Func<TParam1, TParam2, TResult>> callMethod, Type targetType, Type replacementType)
+        {
+            return (Expression<Func<TParam1, TParam2, TResult>>)ToGenericCall((LambdaExpression)callMethod, targetType, replacementType);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using VideoMeetups.Data.Repositories;
+using VideoMeetups.Logic.Repositories;
 
 namespace VideoMeetups.Data.Bootstrap
 {
@@ -8,6 +10,7 @@ namespace VideoMeetups.Data.Bootstrap
         {
             serviceCollection.AddSingleton<NameFormatter>();
             serviceCollection.AddScoped(svc => new ElasticProvider("VideoMeetups", svc.GetService<NameFormatter>()));
+            serviceCollection.AddTransient<IUserRepository, UserRepository>();
         }
     }
 }

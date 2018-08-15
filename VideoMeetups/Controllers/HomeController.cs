@@ -11,6 +11,7 @@ namespace VideoMeetups.Controllers
     {
         public IActionResult Index()
         {
+            var gg = User.Identity.IsAuthenticated;
             return View();
         }
 

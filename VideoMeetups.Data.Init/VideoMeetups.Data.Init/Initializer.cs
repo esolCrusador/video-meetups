@@ -30,6 +30,7 @@ namespace VideoMeetups.Data.Init
                 var entityType = initializer.GetEntityType();
 
                 await _elasticProvider.CreateMapping(entityType, cancellationToken);
+                await _elasticProvider.InitializeData(entityType, entitites, cancellationToken);
             }
         }
 

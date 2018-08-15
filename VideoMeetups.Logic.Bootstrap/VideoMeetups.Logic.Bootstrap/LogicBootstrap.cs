@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using VideoMeetups.Logic.Contracts;
+using VideoMeetups.Logic.Services;
 
 namespace VideoMeetups.Logic.Bootstrap
 {
@@ -10,6 +12,7 @@ namespace VideoMeetups.Logic.Bootstrap
         public static void Bootstrap(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<PasswordManager>();
+            serviceCollection.AddTransient<IUserService, UserService>();
         }
     }
 }

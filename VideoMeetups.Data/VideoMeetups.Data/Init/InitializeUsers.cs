@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VideoMeetups.Data.Entities;
 using VideoMeetups.Logic;
 
@@ -15,11 +16,7 @@ namespace VideoMeetups.Data.Init
 
         public override IEnumerable<UserEntity> GetInitialEntities()
         {
-            yield return new UserEntity
-            {
-                Username = "esolCrusador",
-                PasswordHash = _passwordManager.GenerateHash("Passw0rd!")
-            };
+            yield break;
         }
     }
 }

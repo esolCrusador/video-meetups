@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -19,6 +19,20 @@
   <ItemGroup>
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
     <Content Remove="ClientApp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ClientApp\components\HomePage.Component.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VideoMeetups.Data.Bootstrap\VideoMeetups.Data.Bootstrap.csproj" />
+    <ProjectReference Include="..\VideoMeetups.Logic.Bootstrap\VideoMeetups.Logic.Bootstrap\VideoMeetups.Logic.Bootstrap.csproj" />
+    <ProjectReference Include="..\VideoMeetups.Logic\VideoMeetups.Logic\VideoMeetups.Logic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\components\HomePage.Component.tsx" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

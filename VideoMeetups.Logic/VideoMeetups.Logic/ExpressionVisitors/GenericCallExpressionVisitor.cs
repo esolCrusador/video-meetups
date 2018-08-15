@@ -42,6 +42,22 @@ namespace VideoMeetups.Logic.ExpressionVisitors
             return Expression.Lambda(body, lambda.TailCall, parameters);
         }
 
+        protected override Expression VisitNew(NewExpression node)
+        {
+            ConstructorInfo constructor = node.Constructor;
+            if(TryReplaceType(constructor.DeclaringType, out Type newDeclaringType))
+            {
+                var argumentTypes = constructor.GetParameters().Select(pi => pi.ParameterType).ToArray();
+                TryReplaceGenericArguments(argumentTypes, out argumentTypes);
+
+                constructor = newDeclaringType.GetConstructor(argumentTypes);
+
+                return Expression.New(constructor, node.Arguments.Select(arg => this.Visit(arg)));
+            }
+
+            return base.VisitNew(node);
+        }
+
         protected override Expression VisitParameter(ParameterExpression parameterExpression)
         {
             var cacheKey = new ParameterExpressionKey(parameterExpression);
