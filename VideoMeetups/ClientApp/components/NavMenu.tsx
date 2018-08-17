@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import AuthenticationComponent from './Authentication.Component';
 
 export class NavMenu extends React.Component<{}, {}> {
     public render() {
@@ -41,7 +42,7 @@ export class NavMenu extends React.Component<{}, {}> {
                         </ul>
                         <ul className='nav navbar-nav navbar-right'>
                             <li>
-                                <a href="/Account/ExternalLogin">Login</a>
+                                <AuthenticationComponent></AuthenticationComponent>
                             </li>
                         </ul>
                     </div>

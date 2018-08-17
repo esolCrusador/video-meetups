@@ -4,6 +4,7 @@ import * as Counter from './Counter';
 // The top-level state object
 export interface ApplicationState {
     counter: Counter.CounterState;
+    server: any,
     weatherForecasts: WeatherForecasts.WeatherForecastsState;
 }
 
@@ -12,7 +13,10 @@ export interface ApplicationState {
 // acts on the corresponding ApplicationState property type.
 export const reducers = {
     counter: Counter.reducer,
-    weatherForecasts: WeatherForecasts.reducer
+    weatherForecasts: WeatherForecasts.reducer,
+    server: (state: any, action: any) => {
+        return state;
+    }
 };
 
 // This type can be used as a hint on action creators so that its 'dispatch' and 'getState' params are

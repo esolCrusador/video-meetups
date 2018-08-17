@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\components\Authentication.Component.tsx" />
     <None Remove="ClientApp\components\HomePage.Component.tsx" />
   </ItemGroup>
 
@@ -32,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\components\Authentication.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\HomePage.Component.tsx" />
   </ItemGroup>
 
