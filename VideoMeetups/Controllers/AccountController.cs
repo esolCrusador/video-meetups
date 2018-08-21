@@ -73,6 +73,14 @@ namespace VideoMeetups.Controllers
             return RedirectToLocal(returnUrl);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Logout(string returnUrl = null)
+        {
+            await _signInManager.SignOutAsync();
+
+            return RedirectToLocal(returnUrl);
+        }
+
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

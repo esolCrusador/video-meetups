@@ -23,7 +23,10 @@
 
   <ItemGroup>
     <None Remove="ClientApp\components\Authentication.Component.tsx" />
+    <None Remove="ClientApp\components\Facebook-Avatar.Component.tsx" />
     <None Remove="ClientApp\components\HomePage.Component.tsx" />
+    <None Remove="ClientApp\models\IApplicationUser.Model.ts" />
+    <None Remove="ClientApp\models\IServerInfo.Model.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,7 +37,10 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\components\Authentication.Component.tsx" />
+    <TypeScriptCompile Include="ClientApp\components\Facebook-Avatar.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\HomePage.Component.tsx" />
+    <TypeScriptCompile Include="ClientApp\models\IApplicationUser.Model.ts" />
+    <TypeScriptCompile Include="ClientApp\models\IServerInfo.Model.ts" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

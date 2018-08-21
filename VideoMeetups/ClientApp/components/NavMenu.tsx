@@ -41,9 +41,7 @@ export class NavMenu extends React.Component<{}, {}> {
                             </li>
                         </ul>
                         <ul className='nav navbar-nav navbar-right'>
-                            <li>
-                                <AuthenticationComponent></AuthenticationComponent>
-                            </li>
+                            <AuthenticationComponent></AuthenticationComponent>
                         </ul>
                     </div>
                 </div>

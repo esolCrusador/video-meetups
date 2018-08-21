@@ -1,10 +1,11 @@
 import * as WeatherForecasts from './WeatherForecasts';
 import * as Counter from './Counter';
+import { IServerInfoModel } from '../models/IServerInfo.Model';
 
 // The top-level state object
 export interface ApplicationState {
     counter: Counter.CounterState;
-    server: any,
+    server: IServerInfoModel,
     weatherForecasts: WeatherForecasts.WeatherForecastsState;
 }
 
@@ -14,8 +15,8 @@ export interface ApplicationState {
 export const reducers = {
     counter: Counter.reducer,
     weatherForecasts: WeatherForecasts.reducer,
-    server: (state: any, action: any) => {
-        return state;
+    server: (state: IServerInfoModel) => {
+        return state || {};
     }
 };
 

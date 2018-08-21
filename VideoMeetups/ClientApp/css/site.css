@@ -1,0 +1,18 @@
+img.avatar, div.avatar{
+    height: 2em;
+    width: 2em;
+
+    margin-top: -0.5em;
+    margin-bottom: -0.5em;
+
+    border-radius: 50%;
+    background-color: white;
+    overflow: hidden;
+}
+
+div.avatar .glyphicon{
+    font-size: 30px;
+}
+.account-dropdown{
+    min-width: auto;
+}
