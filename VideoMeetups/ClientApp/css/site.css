@@ -16,3 +16,6 @@ div.avatar .glyphicon{
 .account-dropdown{
     min-width: auto;
 }
+ul.react-datepicker__time-list{
+    padding-left: 0;
+}
