@@ -23,8 +23,10 @@
 
   <ItemGroup>
     <None Remove="ClientApp\components\Authentication.Component.tsx" />
+    <None Remove="ClientApp\components\event\Event-Create.Component.tsx" />
     <None Remove="ClientApp\components\Facebook-Avatar.Component.tsx" />
     <None Remove="ClientApp\components\HomePage.Component.tsx" />
+    <None Remove="ClientApp\models\event\IEvent-Edit.Model.ts" />
     <None Remove="ClientApp\models\IApplicationUser.Model.ts" />
     <None Remove="ClientApp\models\IServerInfo.Model.ts" />
   </ItemGroup>
@@ -37,8 +39,10 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\components\Authentication.Component.tsx" />
+    <TypeScriptCompile Include="ClientApp\components\event\Event-Create.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\Facebook-Avatar.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\HomePage.Component.tsx" />
+    <TypeScriptCompile Include="ClientApp\models\event\IEvent-Edit.Model.ts" />
     <TypeScriptCompile Include="ClientApp\models\IApplicationUser.Model.ts" />
     <TypeScriptCompile Include="ClientApp\models\IServerInfo.Model.ts" />
   </ItemGroup>

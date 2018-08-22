@@ -1,35 +1,29 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using VideoMeetups.Models.Account;
+using VideoMeetups.Logic.Contracts;
+using VideoMeetups.Logic.DomainModels.Account;
 
 namespace VideoMeetups.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly UserManager<ApplicationUserModel> _userManager;
-        public HomeController(UserManager<ApplicationUserModel> userManager)
+        private readonly IUserContextContainer _userContextContainer;
+        public HomeController(IUserContextContainer userContextContainer)
         {
-            _userManager = userManager;
+            _userContextContainer = userContextContainer;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             dynamic model = new ExpandoObject();
-            if (User.Identity.IsAuthenticated) {
-                var userIdentity = User.Identities.First();
-                var userId = userIdentity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            model.User = await _userContextContainer.GetUser(cancellationToken);
 
-                var user = await _userManager.FindByIdAsync(userId);
-
-                model.User = user;
-            }
             return View(model);
         }
 

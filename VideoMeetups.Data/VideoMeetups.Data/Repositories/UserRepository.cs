@@ -17,7 +17,7 @@ namespace VideoMeetups.Data.Repositories
 
         public async Task CreateUser(ApplicationUser applicationUser, CancellationToken cancellationToken)
         {
-            await _elasticProvider.Create(Map(applicationUser), cancellationToken);
+            await _elasticProvider.Create(Map(applicationUser), Elasticsearch.Net.Refresh.True, cancellationToken);
         }
 
         public async Task DeleteUser(long userId, CancellationToken cancellationToken)
@@ -34,7 +34,7 @@ namespace VideoMeetups.Data.Repositories
 
         public async Task<ApplicationUser> FindByName(string normalizedUserName, CancellationToken cancellationToken)
         {
-            var userEntity = await _elasticProvider.FindByPredicate<UserEntity>(u => u.Username == normalizedUserName, cancellationToken);
+            var userEntity = await _elasticProvider.FindSingleByPredicate<UserEntity>(u => u.Username == normalizedUserName, cancellationToken);
 
             return userEntity == null ? null : Map(userEntity);
         }

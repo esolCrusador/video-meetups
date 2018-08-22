@@ -10,6 +10,7 @@ namespace VideoMeetups.Data.Bootstrap
             DataBootstrap.Bootstrap(serviceCollection);
 
             serviceCollection.AddTransient<IDataInitializer, InitializeUsers>();
+            serviceCollection.AddTransient<IDataInitializer, InitializeEvents>();
             serviceCollection.AddTransient<PropertyMetadataResolver>();
         }
     }

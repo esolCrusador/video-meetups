@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VideoMeetups.Data.Bootstrap;
 using VideoMeetups.Logic.Bootstrap;
-using VideoMeetups.Models.Account;
+using VideoMeetups.Logic.Contracts;
+using VideoMeetups.Logic.DomainModels.Account;
 
 namespace VideoMeetups
 {
@@ -42,13 +40,19 @@ namespace VideoMeetups
                 {
                     opts.Cookie.Name = "VMAuth";
                 });
-            services.AddIdentity<ApplicationUserModel, IdentityRole>()
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddUserManager<CustomUserManager>()
                 .AddUserStore<CustomUserStore>()
                 .AddRoleStore<CustomRoleStore>()
                 .AddDefaultTokenProviders();
+            services.AddTransient<IUserContextContainer, UserContextContainer>();
 
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(opts=>
+            {
+                opts.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,6 +11,7 @@ namespace VideoMeetups.Data.Bootstrap
             serviceCollection.AddSingleton<NameFormatter>();
             serviceCollection.AddScoped(svc => new ElasticProvider("VideoMeetups", svc.GetService<NameFormatter>()));
             serviceCollection.AddTransient<IUserRepository, UserRepository>();
+            serviceCollection.AddTransient<IEventsRepository, EventsRepository>();
         }
     }
 }

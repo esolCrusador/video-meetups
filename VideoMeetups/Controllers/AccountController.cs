@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using VideoMeetups.Models.Account;
+using VideoMeetups.Logic.DomainModels.Account;
 
 namespace VideoMeetups.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUserModel> _userManager;
-        private readonly SignInManager<ApplicationUserModel> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(UserManager<ApplicationUserModel> userManager, SignInManager<ApplicationUserModel> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
 
             _userManager = userManager;
@@ -51,7 +51,7 @@ namespace VideoMeetups.Controllers
                 var identity = info.Principal.Identities.First();
                 var email = identity.Claims.First(c => c.Type == ClaimTypes.Email).Value;
 
-                var newUser = new ApplicationUserModel
+                var newUser = new ApplicationUser
                 {
                     UserId = long.Parse(info.ProviderKey),
                     FullName = info.Principal.Identity.Name,

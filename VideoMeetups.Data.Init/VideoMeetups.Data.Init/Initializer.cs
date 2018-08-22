@@ -20,8 +20,6 @@ namespace VideoMeetups.Data.Init
 
         public async Task Initialize(CancellationToken cancellationToken)
         {
-            await _elasticProvider.CreateDatabaseIfNotExists();
-
             foreach (var initializer in _initializers)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -29,6 +27,7 @@ namespace VideoMeetups.Data.Init
                 var entitites = initializer.GetInitialEntities();
                 var entityType = initializer.GetEntityType();
 
+                await _elasticProvider.CreateDatabaseIfNotExists(entityType);
                 await _elasticProvider.CreateMapping(entityType, cancellationToken);
                 await _elasticProvider.InitializeData(entityType, entitites, cancellationToken);
             }
