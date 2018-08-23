@@ -62,29 +62,31 @@ export const actionCreators = {
 
 const unloadedState: WeatherForecastsState = { forecasts: [], isLoading: false };
 
-export const reducer: Reducer<WeatherForecastsState> = (state: WeatherForecastsState, incomingAction: Action) => {
-    const action = incomingAction as KnownAction;
-    switch (action.type) {
-        case 'REQUEST_WEATHER_FORECASTS':
-            return {
-                startDateIndex: action.startDateIndex,
-                forecasts: state.forecasts,
-                isLoading: true
-            };
-        case 'RECEIVE_WEATHER_FORECASTS':
-            // Only accept the incoming data if it matches the most recent request. This ensures we correctly
-            // handle out-of-order responses.
-            if (action.startDateIndex === state.startDateIndex) {
+export const reducer: Reducer<WeatherForecastsState> = (state: WeatherForecastsState | undefined, incomingAction: Action) => {
+    if (state) {
+        const action = incomingAction as KnownAction;
+        switch (action.type) {
+            case 'REQUEST_WEATHER_FORECASTS':
                 return {
                     startDateIndex: action.startDateIndex,
-                    forecasts: action.forecasts,
-                    isLoading: false
+                    forecasts: state.forecasts,
+                    isLoading: true
                 };
-            }
-            break;
-        default:
-            // The following line guarantees that every action in the KnownAction union has been covered by a case above
-            const exhaustiveCheck: never = action;
+            case 'RECEIVE_WEATHER_FORECASTS':
+                // Only accept the incoming data if it matches the most recent request. This ensures we correctly
+                // handle out-of-order responses.
+                if (action.startDateIndex === state.startDateIndex) {
+                    return {
+                        startDateIndex: action.startDateIndex,
+                        forecasts: action.forecasts,
+                        isLoading: false
+                    };
+                }
+                break;
+            default:
+                // The following line guarantees that every action in the KnownAction union has been covered by a case above
+                const exhaustiveCheck: never = action;
+        }
     }
 
     return state || unloadedState;
