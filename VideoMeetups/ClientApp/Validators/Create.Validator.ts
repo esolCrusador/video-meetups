@@ -1,7 +1,6 @@
-﻿import { Validator } from "formstate";
-import { IValidate, IShortValidate } from "./IValidate";
+﻿import { IValidate, IShortValidate } from "./IValidate";
 import { IGetErrorMessage } from "./IGetErrorMessage";
-import { RelativeTimeFuturePastVal } from "moment";
+import { Validator } from "./Validator";
 
 export function CreateValidator<TValue>(isValid: IShortValidate<TValue>, errorMessage: string): Validator<TValue>;
 export function CreateValidator<TValue>(isValid: IShortValidate<TValue>, errorMessage: () => string): Validator<TValue>;

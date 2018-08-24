@@ -4,19 +4,55 @@ import * as Moment from "moment";
 import DatePicker from "react-datepicker";
 import { IEventCreateModel } from "../../models/event/IEvent-Create.Model";
 import { RouteComponentProps } from "react-router";
-import { EventCreateFormState } from "./Event-Create.FormState";
+import { FormState } from "../../Validators/FormState";
+import { CreateValidator } from "../../Validators/Create.Validator";
+import { RequiredValidate } from "../../Validators/Required.Validate";
+import { IDateRangeOptions, RangeValidator } from "../../Validators/Range.Validate";
 
-export class EventCreateComponent extends Component<RouteComponentProps<{}>, EventCreateFormState> {
+declare type EventCreateState = IEventCreateModel & { EndDate: Moment.Moment | null };
+
+export class EventCreateComponent extends Component<RouteComponentProps<{}>, EventCreateState> {
+    public FormState: FormState<EventCreateState>;
+
     constructor(props: RouteComponentProps<{}>, context: any) {
         super(props, context);
 
-        this.state = new EventCreateFormState({
+        this.state = {
             EventName: "New Event",
             Description: "",
             StartDate: EventCreateComponent.getInitialStartDate(),
-            Duration: null
-        });
+            Duration: null,
+            EndDate: null
+        };
+
+        const createDateRangeValidator = (fieldName: string) => CreateValidator<Moment.Moment | null, IDateRangeOptions>(
+            RangeValidator.MomentRangeValidate,
+            (opts: IDateRangeOptions) => `The ${fieldName} must be between ${opts.MinDate ? opts.MinDate().format(this.DateTimeFormat) : ""} and ${opts.MaxDate ? opts.MaxDate().format(this.DateTimeFormat) : ""}`,
+            { MinDate: () => Moment(), MaxDate: () => Moment().add(1, "years") }
+        );
+
+        this.FormState = new FormState<EventCreateState>(this.state, changes => this.setState(changes))
+            .Field<string>("EventName", f => f.Validator(CreateValidator(RequiredValidate, "The Field Event Name is required")))
+            .Field<Moment.Moment>("StartDate", f => f.Validator(
+                CreateValidator(RequiredValidate, "The Field Start Date is required"),
+                createDateRangeValidator("Start Date")
+            ).OnDidChange((oldValue, newValue) => {
+                if (oldValue !== newValue) {
+                    this.FormState.OnChange("EndDate", this.FormState.GetValue("EndDate"));
+                }
+            })
+            )
+            .Field<Moment.Moment | null>("EndDate", f => f.Validator(
+                createDateRangeValidator("End Date"),
+                CreateValidator(date => !date || !this.state.StartDate || this.state.StartDate < date, "End Date must be greater then Start Date")
+            ));
     }
+
+    componentWillUnmount() {
+        this.FormState.Dispose();
+    }
+
+    private DateTimeFormat = "DD.MM.YYYY hh:mm A";
 
     private static getInitialStartDate() {
         const date = Moment().add(7, 'days');
@@ -30,9 +66,11 @@ export class EventCreateComponent extends Component<RouteComponentProps<{}>, Eve
     }
 
     private async submit(): Promise<any> {
-        const state = await this.state.getStateIfValid();
-        if (state)
-            console.log(state);
+        const validationResult = await this.FormState.Validate();
+        if (validationResult)
+            console.log(`Validation failed: ${JSON.stringify(validationResult)}`);
+        else
+            console.log(`The State is :${JSON.stringify(this.state)}`);
     }
 
     //private handleChange(propertyName: keyof IEventCreateModel, value: any) {
@@ -78,35 +116,41 @@ export class EventCreateComponent extends Component<RouteComponentProps<{}>, Eve
                     <div className="col-md-3">
                         <div className="form-group form-group-sm">
                             <label htmlFor="EventName" className="control-label">Event Name</label>
-                            <input type="text" className="form-control" id="EventName" placeholder="Event Name"
-                                value={this.state.EventName.value}
-                                onChange={ev => this.state.EventName.onChange(ev.target.value)}
+                            <input type="text" className={`form-control${this.FormState.Fields.EventName.IsValid ? "" : " has-error"}`} id="EventName" placeholder="Event Name"
+                                value={this.FormState.GetValue("EventName")}
+                                onChange={ev => this.FormState.OnChange("EventName", ev.target.value)}
                             />
-                            {this.state.EventName.hasError ? <p>{this.state.EventName.error}</p> : ""}
+                            {this.FormState.ValidationErrors["EventName"].map(error => <p key={error} className="validation-error">{error}</p>)}
                         </div>
                     </div>
                     <div className="col-md-12">
                         <div className="form-group form-group-sm">
                             <label htmlFor="Description" className="control-label">Description</label>
-                            <textarea type="text" className="form-control" id="Description" placeholder="Description"
-                                value={this.state.Description.value}
-                                onChange={ev => this.state.Description.onChange(ev.target.value)} />
+                            <textarea type="text" className={`form-control${this.FormState.Fields.Description.IsValid ? "" : " has-error"}`}
+                                id="Description" placeholder="Description"
+                                value={this.FormState.GetValue("Description")}
+                                onChange={ev => this.FormState.OnChange("Description", ev.target.value)} />
+                            {this.FormState.ValidationErrors["Description"].map(error => <p key={error} className="validation-error">{error}</p>)}
                         </div>
                     </div>
                     <div className="col-md-3">
                         <div className="form-group form-group-sm">
                             <label htmlFor="EventDate" className="control-label">Start Date</label>
-                            <DatePicker className="form-control" id="EventDate" timeFormat="hh:mm A" timeIntervals={15} showTimeSelect
-                                selected={this.state.StartDate.value} required timeCaption="time" minDate={Moment().add(1, "day")}
-                                onChange={date => this.state.StartDate.onChange(date)} dateFormat="DD.MM.YYYY hh:mm A" />
+                            <DatePicker className={`form-control${this.FormState.Fields.StartDate.IsValid ? "" : " has-error"}`}
+                                id="EventDate" timeFormat="hh:mm A" timeIntervals={15} showTimeSelect
+                                selected={this.FormState.GetValue("StartDate")} required timeCaption="time" minDate={Moment().add(1, "day")}
+                                onChange={date => this.FormState.OnChange("StartDate", date)} dateFormat={this.DateTimeFormat} />
+                            {this.FormState.ValidationErrors["StartDate"].map(error => <p key={error} className="validation-error">{error}</p>)}
                         </div>
                     </div>
                     <div className="col-md-3">
                         <div className="form-group form-group-sm">
                             <label htmlFor="EventEndDate" className="control-label">End Date</label>
-                            <DatePicker className="form-control" id="EventEndDate" timeFormat="hh:mm A" timeIntervals={15} showTimeSelect
-                                selected={this.state.EndDate.value} required minDate={this.state.StartDate.value || Moment()}
-                                onChange={date => this.state.EndDate.onChange(date)} dateFormat="DD.MM.YYYY hh:mm A" />
+                            <DatePicker className={`form-control${this.FormState.Fields.EndDate.IsValid ? "" : " has-error"}`}
+                                id="EventEndDate" timeFormat="hh:mm A" timeIntervals={15} showTimeSelect
+                                selected={this.FormState.GetValue("EndDate")} required minDate={this.state.StartDate || Moment()}
+                                onChange={date => this.FormState.OnChange("EndDate", date)} dateFormat={this.DateTimeFormat} />
+                            {this.FormState.ValidationErrors["EndDate"].map(error => <p key={error} className="validation-error">{error}</p>)}
                         </div>
                     </div>
                 </div>

@@ -19,3 +19,9 @@ div.avatar .glyphicon{
 ul.react-datepicker__time-list{
     padding-left: 0;
 }
+.validation-error{
+    color: red;
+}
+.has-error{
+    outline: 1px solid red;
+}

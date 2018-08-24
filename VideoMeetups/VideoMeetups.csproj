@@ -25,17 +25,19 @@
     <None Remove="ClientApp\components\Authenticated.Component.tsx" />
     <None Remove="ClientApp\components\Authentication.Component.tsx" />
     <None Remove="ClientApp\components\event\Event-Create.Component.tsx" />
-    <None Remove="ClientApp\components\event\Event-Create.FormState.ts" />
     <None Remove="ClientApp\components\Facebook-Avatar.Component.tsx" />
     <None Remove="ClientApp\components\HomePage.Component.tsx" />
     <None Remove="ClientApp\models\event\IEvent-Create.Model.ts" />
     <None Remove="ClientApp\models\IApplicationUser.Model.ts" />
     <None Remove="ClientApp\models\IServerInfo.Model.ts" />
     <None Remove="ClientApp\Validators\Create.Validator.ts" />
+    <None Remove="ClientApp\Validators\FieldState.ts" />
+    <None Remove="ClientApp\Validators\FormState.ts" />
     <None Remove="ClientApp\Validators\IGetErrorMessage.ts" />
     <None Remove="ClientApp\Validators\IValidate.ts" />
     <None Remove="ClientApp\Validators\Range.Validate.ts" />
     <None Remove="ClientApp\Validators\Required.Validate.ts" />
+    <None Remove="ClientApp\Validators\Validator.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,17 +50,19 @@
     <TypeScriptCompile Include="ClientApp\components\Authenticated.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\Authentication.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\event\Event-Create.Component.tsx" />
-    <TypeScriptCompile Include="ClientApp\components\event\Event-Create.FormState.ts" />
     <TypeScriptCompile Include="ClientApp\components\Facebook-Avatar.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\components\HomePage.Component.tsx" />
     <TypeScriptCompile Include="ClientApp\models\event\IEvent-Create.Model.ts" />
     <TypeScriptCompile Include="ClientApp\models\IApplicationUser.Model.ts" />
     <TypeScriptCompile Include="ClientApp\models\IServerInfo.Model.ts" />
+    <TypeScriptCompile Include="ClientApp\Validators\FieldState.ts" />
+    <TypeScriptCompile Include="ClientApp\Validators\FormState.ts" />
     <TypeScriptCompile Include="ClientApp\Validators\IGetErrorMessage.ts" />
     <TypeScriptCompile Include="ClientApp\Validators\IValidate.ts" />
     <TypeScriptCompile Include="ClientApp\Validators\Range.Validate.ts" />
     <TypeScriptCompile Include="ClientApp\Validators\Required.Validate.ts" />
     <TypeScriptCompile Include="ClientApp\Validators\Create.Validator.ts" />
+    <TypeScriptCompile Include="ClientApp\Validators\Validator.ts" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
