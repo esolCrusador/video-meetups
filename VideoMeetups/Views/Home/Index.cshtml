@@ -1,8 +1,15 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+@if (Model.Prerender)
+{
+    <div id="react-app" asp-prerender-module="ClientApp/dist/main-server" asp-prerender-data="Model">Loading...</div>
+}
+else
+{
+    <div id="react-app">Loading...</div>
 
-<div id="react-app" asp-prerender-module="ClientApp/dist/main-server" asp-prerender-data="Model">Loading...</div>
+}
 
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>

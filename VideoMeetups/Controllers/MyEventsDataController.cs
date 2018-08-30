@@ -1,17 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using VideoMeetups.Helpers;
 using VideoMeetups.Logic.Contracts;
 using VideoMeetups.Logic.DomainModels.Events;
+using VideoMeetups.Models;
 using VideoMeetups.Models.Events;
 
 namespace VideoMeetups.Controllers
 {
-    [Route("MyEvents")]
-    public class MyEventsDataController: Controller
+    [Route("api/MyEvents")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class MyEventsDataController : Controller
     {
         private readonly IMyEventsService _myEventsService;
 
@@ -22,10 +28,10 @@ namespace VideoMeetups.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> CreateEvent([FromBody]EventItemModel model, CancellationToken cancellationToken)
+        public async Task<ExecutionResult> CreateEvent([FromBody]EventItemModel model, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
-                return Json(ModelState.GetValidationResult());
+                return ExecutionResult.From(ModelState.GetValidationResult());
 
             var eventItem = Map(model);
             await _myEventsService.CreateEvent(eventItem, cancellationToken);
@@ -35,11 +41,11 @@ namespace VideoMeetups.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetEvents(CancellationToken cancellationToken)
+        public async Task<ExecutionResult<List<EventItemModel>>> GetEvents(CancellationToken cancellationToken)
         {
             var events = await _myEventsService.GetEvents(cancellationToken);
 
-            return Json(events.Select(e => Map(e)).ToList());
+            return ExecutionResult.From(events.Select(e => Map(e)).ToList());
         }
 
 

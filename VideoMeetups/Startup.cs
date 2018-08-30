@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,10 +8,17 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Diagnostics;
+using System.Security.Claims;
+using System.Text;
 using VideoMeetups.Data.Bootstrap;
 using VideoMeetups.Logic.Bootstrap;
 using VideoMeetups.Logic.Contracts;
 using VideoMeetups.Logic.DomainModels.Account;
+using VideoMeetups.Models;
 
 namespace VideoMeetups
 {
@@ -29,16 +38,30 @@ namespace VideoMeetups
             DataBootstrap.Bootstrap(services);
 
             services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
-
+            services.Configure<BarrierOptions>(options =>
+            {
+                options.SecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("51BDEAFE-C65E-4D72-86D9-35E46D19A5FF"));
+                options.SecurityAlgorithm = SecurityAlgorithms.HmacSha256;
+                options.Issuer = "Local";
+            });
             services.AddAuthentication()
-                .AddFacebook(opts =>
+                .AddFacebook("Facebook", opts =>
                 {
                     opts.AppId = "564864066973412";
                     opts.AppSecret = "770e2c75bf5434570f67a862bcc99ad1";
                 })
-                .AddCookie(opts =>
+                .AddJwtBearer("Bearer", options =>
                 {
-                    opts.Cookie.Name = "VMAuth";
+                    options.SaveToken = true;
+                    options.ClaimsIssuer = "Local";
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = "Local",
+                        ValidateIssuerSigningKey = true,
+                        ValidateAudience = false,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("51BDEAFE-C65E-4D72-86D9-35E46D19A5FF")),
+                    };
                 });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -52,6 +75,7 @@ namespace VideoMeetups
             services.AddMvc().AddJsonOptions(opts=>
             {
                 opts.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+                opts.SerializerSettings.ContractResolver = new DefaultContractResolver();
             });
         }
 
@@ -74,6 +98,17 @@ namespace VideoMeetups
 
             app.UseStaticFiles();
             app.UseAuthentication();
+            app.Use(async (context, next) =>
+            {
+                if (!context.User.Identity.IsAuthenticated)
+                {
+                    var jwtAuthResult = await context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+                    if (jwtAuthResult.Succeeded)
+                        context.User = jwtAuthResult.Principal;
+                }
+
+                await next();
+            });
 
             app.UseMvc(routes =>
             {

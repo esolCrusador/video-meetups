@@ -2,4 +2,5 @@
 
 export interface IServerInfoModel {
     user: IApplicationUserModel | null;
+    token: string;
 }

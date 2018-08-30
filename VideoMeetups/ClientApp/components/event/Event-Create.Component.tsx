@@ -8,17 +8,22 @@ import { FormState } from "../../Validators/FormState";
 import { CreateValidator } from "../../Validators/Create.Validator";
 import { RequiredValidate } from "../../Validators/Required.Validate";
 import { IDateRangeOptions, RangeValidator } from "../../Validators/Range.Validate";
+import { actionCreators } from "../../store/My-Events.Store";
+import { ApplicationState } from "../../store";
+import * as MyEvents from '../../store/My-Events.Store';
+import { connect } from "react-redux";
 
 declare type EventCreateState = IEventCreateModel & { EndDate: Moment.Moment | null };
+declare type EventCreateProps = { createEvent: MyEvents.createEvent} & MyEvents.EventsState & RouteComponentProps<{}>;
 
-export class EventCreateComponent extends Component<RouteComponentProps<{}>, EventCreateState> {
+class EventCreateComponent extends Component<EventCreateProps, EventCreateState> {
     public FormState: FormState<EventCreateState>;
 
-    constructor(props: RouteComponentProps<{}>, context: any) {
+    constructor(props: EventCreateProps, context: any) {
         super(props, context);
 
         this.state = {
-            EventName: "New Event",
+            EventName: "",
             Description: "",
             StartDate: EventCreateComponent.getInitialStartDate(),
             Duration: null,
@@ -32,20 +37,16 @@ export class EventCreateComponent extends Component<RouteComponentProps<{}>, Eve
         );
 
         this.FormState = new FormState<EventCreateState>(this.state, changes => this.setState(changes))
-            .Field<string>("EventName", f => f.Validator(CreateValidator(RequiredValidate, "The Field Event Name is required")))
+            .Field<string>("EventName", f => f.Validator(/*CreateValidator(RequiredValidate, "The Field Event Name is required")*/))
             .Field<Moment.Moment>("StartDate", f => f.Validator(
                 CreateValidator(RequiredValidate, "The Field Start Date is required"),
                 createDateRangeValidator("Start Date")
-            ).OnDidChange((oldValue, newValue) => {
-                if (oldValue !== newValue) {
-                    this.FormState.OnChange("EndDate", this.FormState.GetValue("EndDate"));
-                }
-            })
-            )
+            ))
             .Field<Moment.Moment | null>("EndDate", f => f.Validator(
                 createDateRangeValidator("End Date"),
                 CreateValidator(date => !date || !this.state.StartDate || this.state.StartDate < date, "End Date must be greater then Start Date")
-            ));
+            ))
+            .Dependency("StartDate", "EndDate");
     }
 
     componentWillUnmount() {
@@ -69,42 +70,13 @@ export class EventCreateComponent extends Component<RouteComponentProps<{}>, Eve
         const validationResult = await this.FormState.Validate();
         if (validationResult)
             console.log(`Validation failed: ${JSON.stringify(validationResult)}`);
-        else
-            console.log(`The State is :${JSON.stringify(this.state)}`);
+        else {
+            let createEvent = await this.props.createEvent(this.state);
+            if (!createEvent.IsValid) {
+                this.FormState.SetValidationErrors(createEvent.ValidationErrors);
+            }
+        }
     }
-
-    //private handleChange(propertyName: keyof IEventCreateModel, value: any) {
-    //    const newState: Pick<IEventCreateModel, never> = {};
-    //    (newState as any)[propertyName] = value;
-
-    //    this.setState(newState);
-    //}
-
-    //private setStartDate(value: Moment.Moment | null) {
-    //    if (!value) {
-    //        value = EventCreateComponent.getInitialStartDate();
-    //    }
-    //    let endDate: Moment.Moment | null = null;
-    //    if (this.state.Duration) {
-    //        endDate = value.clone().add(this.state.Duration, "minutes");
-    //        EventCreateComponent.roundMinutesTo(endDate, 15);
-    //    }
-
-    //    this.setState({
-    //        StartDate: value,
-    //        EndDate: endDate
-    //    });
-    //}
-
-    //private setEndDate(value: Moment.Moment | null) {
-    //    if (value && value < this.state.StartDate)
-    //        value = this.state.StartDate.clone().add(15, "minutes");
-
-    //    this.setState({
-    //        EndDate: value,
-    //        Duration: value ? value.diff(this.state.StartDate, "minutes") : null
-    //    });
-    //}
 
     public render() {
         return (
@@ -162,3 +134,8 @@ export class EventCreateComponent extends Component<RouteComponentProps<{}>, Eve
         );
     }
 }
+
+export default connect(
+    (state: ApplicationState) => state.myEvents, // Selects which state properties are merged into the component's props
+    MyEvents.actionCreators                 // Selects which action creators are merged into the component's props
+)(EventCreateComponent) as typeof EventCreateComponent;

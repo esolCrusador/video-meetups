@@ -1,6 +1,9 @@
 ﻿import { FieldState, IFieldStateBuilder, IFieldState } from "./FieldState";
 
 export class FormState<TState> {
+    static SetValidation(arg0: any): any {
+        throw new Error("Method not implemented.");
+    }
     private readonly _fieldNames: (keyof TState)[];
     public readonly _fields: { [fieldName in keyof TState]: FieldState<any> };
     private readonly _setState: (stateChange: any) => void;
@@ -48,12 +51,23 @@ export class FormState<TState> {
         return this;
     }
 
+    public Dependency(field: keyof TState, dependency: keyof TState): FormState<TState> {
+        const fieldState = this._fields[field];
+
+        fieldState.OnDidChange((oldValue, newValue) => {
+            if (oldValue !== newValue)
+                this.OnChange(dependency, this._fields[dependency].Value);
+        });
+
+        return this;
+    }
+
     public Validate(): Promise<{ [fieldName in keyof TState]: string[] } | false> {
         const validationResultPromises = this.GetFields().map(field => field.Validate()
             .then(validationResult => ({ fieldName: field.FieldName as keyof TState, validationResult }))
         );
 
-        return Promise.all(validationResultPromises)
+        const validationResult = Promise.all(validationResultPromises)
             .then(validationResults =>
                 validationResults.reduce(
                     (agg, vr) => {
@@ -72,6 +86,22 @@ export class FormState<TState> {
                 )
             )
             .then(vr => vr || false);
+
+        validationResult.then(vr => {
+            this._setState({});
+        });
+
+        return validationResult;
+    }
+
+    public SetValidationErrors(validationStatus: { [propName: string]: string[] }) {
+        for (const fieldName of this._fieldNames) {
+            const fieldErrors = validationStatus[fieldName];
+            if (fieldErrors)
+                this._fields[fieldName].SetValidationErrors(fieldErrors);
+        }
+
+        this._setState({});
     }
 
     private GetFields(): FieldState<any>[] {

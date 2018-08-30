@@ -14,7 +14,7 @@ export default createServerRenderer(params => {
         // corresponding to the incoming URL
         const basename = params.baseUrl.substring(0, params.baseUrl.length - 1); // Remove trailing slash
         const urlAfterBasename = params.url.substring(basename.length);
-        const store = configureStore(createMemoryHistory(), { server: params.data, counter: { count: 10 }, weatherForecasts: { isLoading: true, forecasts: [], startDateIndex: 0 } });
+        const store = configureStore(createMemoryHistory(), { server: params.data, counter: { count: 10 }, weatherForecasts: { isLoading: true, forecasts: [], startDateIndex: 0 }, myEvents: { events: [], isLoading: false } });
         store.dispatch(replace(urlAfterBasename));
 
         // Prepare an instance of the application and perform an inital render that will

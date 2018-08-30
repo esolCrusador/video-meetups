@@ -66,6 +66,11 @@ export class FieldState<TField> implements IFieldStateBuilder<TField> {
         return this.ValidationErrors.length !== 0 && this.ValidationErrors;
     }
 
+    public SetValidationErrors(errors: string[]): void {
+        this.ValidationErrors.length = 0;
+        this.ValidationErrors.push(...errors);
+    }
+
     public OnChange(value: TField) {
         const oldValue = this.Value;
 
