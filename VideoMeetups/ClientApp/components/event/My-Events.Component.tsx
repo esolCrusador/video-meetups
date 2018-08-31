@@ -1,12 +1,14 @@
-﻿import * as MyEvents from "../../store/My-Events.Store";
-import { RouteComponentProps } from "react-router";
+﻿import { RouteComponentProps } from "react-router";
 import * as React from "react";
 import { ApplicationState } from "../../store";
 import { connect } from "react-redux";
 import { EventMapper } from "../../mappers/EventMapper";
+import { IMyEventsService, MyEventsReduxService } from "../../redux-services/MyEventsReduxService";
+import { DIContainer } from "../../DIContainer";
+import { EventsState } from "../../store/EventsState";
 
 declare type EventsListState = {};
-declare type EventCreateProps = typeof MyEvents.actionCreators & MyEvents.EventsState & RouteComponentProps<{}>;
+declare type EventCreateProps = IMyEventsService & EventsState & RouteComponentProps<{}>;
 
 class MyEventsComponent extends React.Component<EventCreateProps, EventsListState>{
     componentWillMount() {
@@ -59,7 +61,9 @@ class MyEventsComponent extends React.Component<EventCreateProps, EventsListStat
     }
 }
 
+const reduxService = DIContainer.resolve(MyEventsReduxService);
+
 export default connect(
-    (state: ApplicationState) => state.myEvents, // Selects which state properties are merged into the component's props
-    MyEvents.actionCreators                 // Selects which action creators are merged into the component's props
+    reduxService.filterState, // Selects which state properties are merged into the component's props
+    reduxService.getDispatchers()                 // Selects which action creators are merged into the component's props
 )(MyEventsComponent) as typeof MyEventsComponent;

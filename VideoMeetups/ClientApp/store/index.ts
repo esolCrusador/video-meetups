@@ -1,14 +1,16 @@
 import * as WeatherForecasts from './WeatherForecasts';
 import * as Counter from './Counter';
 import { IServerInfoModel } from '../models/IServerInfo.Model';
-import * as MyEvents from './My-Events.Store';
+import { DIContainer } from '../DIContainer';
+import { MyEventsReduxService } from '../redux-services/MyEventsReduxService';
+import { EventsState } from './EventsState';
 
 // The top-level state object
 export interface ApplicationState {
     counter: Counter.CounterState;
     server: IServerInfoModel;
     weatherForecasts: WeatherForecasts.WeatherForecastsState;
-    myEvents: MyEvents.EventsState;
+    myEvents: EventsState;
 }
 
 // Whenever an action is dispatched, Redux will update each top-level application state property using
@@ -20,7 +22,7 @@ export const reducers = {
     server: (state: IServerInfoModel) => {
         return state || {};
     },
-    myEvents: MyEvents.reducer
+    myEvents: DIContainer.resolve(MyEventsReduxService).reduce
 };
 
 // This type can be used as a hint on action creators so that its 'dispatch' and 'getState' params are

@@ -30,6 +30,8 @@ module.exports = (env) => {
                 'redux-thunk',
                 'react-router-redux',
                 'jquery',
+                'reflect-metadata',
+                'injection-js',
                 'react-datepicker/dist/react-datepicker.css'
             ],
         },

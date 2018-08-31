@@ -7,6 +7,7 @@ import { createMemoryHistory } from 'history';
 import { createServerRenderer, RenderResult } from 'aspnet-prerendering';
 import { routes } from './routes';
 import configureStore from './configureStore';
+import { ReduxAccessor } from './store/ReduxAccessor';
 
 export default createServerRenderer(params => {
     return new Promise<RenderResult>((resolve, reject) => {
@@ -16,6 +17,7 @@ export default createServerRenderer(params => {
         const urlAfterBasename = params.url.substring(basename.length);
         const store = configureStore(createMemoryHistory(), { server: params.data, counter: { count: 10 }, weatherForecasts: { isLoading: true, forecasts: [], startDateIndex: 0 }, myEvents: { events: [], isLoading: false } });
         store.dispatch(replace(urlAfterBasename));
+        ReduxAccessor.SetStore(store);
 
         // Prepare an instance of the application and perform an inital render that will
         // cause any async tasks (e.g., data access) to begin
