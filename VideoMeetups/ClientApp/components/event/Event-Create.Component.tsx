@@ -11,11 +11,12 @@ import { IDateRangeOptions, RangeValidator } from "../../Validators/Range.Valida
 import { ApplicationState } from "../../store";
 import { connect } from "react-redux";
 import { DIContainer } from "../../DIContainer";
-import { MyEventsReduxService, IMyEventsService } from "../../redux-services/MyEventsReduxService";
+import { MyEventsReduxController, IMyEventsServiceDispatchers } from "../../redux-controllers/MyEventsReduxController";
 import { EventsState } from "../../store/EventsState";
+import { ReduxHelper } from "../../redux-controllers/ReduxHelper";
 
 declare type EventCreateState = IEventCreateModel & { EndDate: Moment.Moment | null };
-declare type EventCreateProps = IMyEventsService & EventsState & RouteComponentProps<{}>;
+declare type EventCreateProps = IMyEventsServiceDispatchers & EventsState & RouteComponentProps<{}>;
 
 class EventCreateComponent extends Component<EventCreateProps, EventCreateState> {
     public FormState: FormState<EventCreateState>;
@@ -136,9 +137,9 @@ class EventCreateComponent extends Component<EventCreateProps, EventCreateState>
     }
 }
 
-const reduxService = DIContainer.resolve(MyEventsReduxService);
+const reduxService = DIContainer.resolve<MyEventsReduxController>(MyEventsReduxController);
 
 export default connect(
-    reduxService.filterState, // Selects which state properties are merged into the component's props
-    reduxService.getDispatchers()                // Selects which action creators are merged into the component's props
+    ReduxHelper.GetStateFilter(reduxService), // Selects which state properties are merged into the component's props
+    ReduxHelper.GetDispatchers<MyEventsReduxController, IMyEventsServiceDispatchers>(reduxService, "requestEvents", "createEvent")
 )(EventCreateComponent) as typeof EventCreateComponent;

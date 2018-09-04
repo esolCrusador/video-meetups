@@ -3,12 +3,13 @@ import * as React from "react";
 import { ApplicationState } from "../../store";
 import { connect } from "react-redux";
 import { EventMapper } from "../../mappers/EventMapper";
-import { IMyEventsService, MyEventsReduxService } from "../../redux-services/MyEventsReduxService";
+import { IMyEventsService, MyEventsReduxController, IMyEventsServiceDispatchers } from "../../redux-controllers/MyEventsReduxController";
 import { DIContainer } from "../../DIContainer";
 import { EventsState } from "../../store/EventsState";
+import { ReduxHelper } from "../../redux-controllers/ReduxHelper";
 
 declare type EventsListState = {};
-declare type EventCreateProps = IMyEventsService & EventsState & RouteComponentProps<{}>;
+declare type EventCreateProps = IMyEventsServiceDispatchers & EventsState & RouteComponentProps<{}>;
 
 class MyEventsComponent extends React.Component<EventCreateProps, EventsListState>{
     componentWillMount() {
@@ -61,9 +62,9 @@ class MyEventsComponent extends React.Component<EventCreateProps, EventsListStat
     }
 }
 
-const reduxService = DIContainer.resolve(MyEventsReduxService);
+const controller = DIContainer.resolve<MyEventsReduxController>(MyEventsReduxController);
 
 export default connect(
-    reduxService.filterState, // Selects which state properties are merged into the component's props
-    reduxService.getDispatchers()                 // Selects which action creators are merged into the component's props
+    ReduxHelper.GetStateFilter<EventsState>(controller), // Selects which state properties are merged into the component's props
+    ReduxHelper.GetDispatchers<MyEventsReduxController, IMyEventsServiceDispatchers>(controller, "requestEvents") // Selects which action creators are merged into the component's props
 )(MyEventsComponent) as typeof MyEventsComponent;

@@ -2,8 +2,9 @@ import * as WeatherForecasts from './WeatherForecasts';
 import * as Counter from './Counter';
 import { IServerInfoModel } from '../models/IServerInfo.Model';
 import { DIContainer } from '../DIContainer';
-import { MyEventsReduxService } from '../redux-services/MyEventsReduxService';
+import { MyEventsReduxController } from '../redux-controllers/MyEventsReduxController';
 import { EventsState } from './EventsState';
+import { ReduxHelper } from '../redux-controllers/ReduxHelper';
 
 // The top-level state object
 export interface ApplicationState {
@@ -22,7 +23,7 @@ export const reducers = {
     server: (state: IServerInfoModel) => {
         return state || {};
     },
-    myEvents: DIContainer.resolve(MyEventsReduxService).reduce
+    myEvents: ReduxHelper.GetReducer(DIContainer.resolve<MyEventsReduxController>(MyEventsReduxController))
 };
 
 // This type can be used as a hint on action creators so that its 'dispatch' and 'getState' params are

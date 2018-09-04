@@ -10,6 +10,7 @@ import { Action } from "redux";
 import { DIContainer } from "../DIContainer";
 import { ApiUtil } from '../repositories/APIUtil';
 import { EventsState } from '../store/EventsState';
+import { IReduxController } from './IReduxController';
 
 interface RequestGetMyEventsAction {
     type: 'MyEvents.Get',
@@ -28,53 +29,49 @@ interface RequestCreateEventAction {
 type KnownAction = RequestGetMyEventsAction | ReceiveGetMyEventsAction | RequestCreateEventAction;
 
 export interface IMyEventsService {
+    requestEvents(dispatch: (action: KnownAction) => void, getState: () => ApplicationState): void;
+    createEvent(event: IEventCreateModel, dispatch: (action: KnownAction) => void, getState: () => ApplicationState): Promise<ExecutionResult<MyEventItemDto[]>>;
+}
+
+export interface IMyEventsServiceDispatchers {
     requestEvents(): void;
-    createEvent(event: IEventCreateModel): Promise<Promise<ExecutionResult<MyEventItemDto[]>>>;
+    createEvent(event: IEventCreateModel): Promise<ExecutionResult<MyEventItemDto[]>>;
 }
 
 @Injectable()
-export class MyEventsReduxService {
+export class MyEventsReduxController implements IMyEventsService, IReduxController<EventsState, KnownAction> {
     constructor(private readonly apiUtil: ApiUtil) {
-        this.reduce = this.reduce.bind(this);
-        this.requestEvents = this.requestEvents.bind(this);
-        this.createEvent = this.createEvent.bind(this);
     }
 
-    public filterState(state: ApplicationState): EventsState {
+    public FilterState(state: ApplicationState): EventsState {
         return state.myEvents;
     }
 
-    public requestEvents(): AppThunkAction<KnownAction> {
-        return (dispatch, getState) => {
-            // Only load data if it's something we don't already have (and are not already loading)
-            if (getState().myEvents.isLoading === false) {
-                this.apiUtil.ApiRequest<MyEventItemDto[]>("api/MyEvents", "GET")
-                    .then(data => {
-                        dispatch({ type: 'MyEvents.Loaded', events: data.Data });
-                    });
+    public requestEvents(dispatch: (action: KnownAction) => void, getState: () => ApplicationState){
+        if (getState().myEvents.isLoading === false) {
+            this.apiUtil.ApiRequest<MyEventItemDto[]>("api/MyEvents", "GET")
+                .then(data => {
+                    dispatch({ type: 'MyEvents.Loaded', events: data.Data });
+                });
 
-                dispatch({ type: 'MyEvents.Get' });
+            dispatch({ type: 'MyEvents.Get' });
 
-                // Ensure server-side prerendering waits for this to complete
-            }
+            // Ensure server-side prerendering waits for this to complete
         }
     }
 
-    public createEvent(event: IEventCreateModel): AppThunkAction<KnownAction> {
-        return (dispatch, getState) => {
-            const token = getState().server.token;
-            // Only load data if it's something we don't already have (and are not already loading)
-            let fetchTask = this.apiUtil.ApiRequest<MyEventItemDto[]>("api/MyEvents", "POST", event)
-                .then(data => {
-                    dispatch({ type: 'MyEvents.Loaded', events: data.Data });
+    public createEvent(event: IEventCreateModel, dispatch: (action: KnownAction) => void, getState: () => ApplicationState): Promise<ExecutionResult<MyEventItemDto[]>> {
+        // Only load data if it's something we don't already have (and are not already loading)
+        let fetchTask = this.apiUtil.ApiRequest<MyEventItemDto[]>("api/MyEvents", "POST", event)
+            .then(data => {
+                dispatch({ type: 'MyEvents.Loaded', events: data.Data });
 
-                    return data;
-                });
+                return data;
+            });
 
-            dispatch({ type: 'MyEvents.Create', event: event });
+        dispatch({ type: 'MyEvents.Create', event: event });
 
-            return fetchTask;
-        }
+        return fetchTask;
     }
 
     public getDispatchers() {
@@ -84,7 +81,7 @@ export class MyEventsReduxService {
         }
     }
 
-    public reduce(state: EventsState, incomingAction: Action): EventsState {
+    public Reduce(state: EventsState, incomingAction: Action): EventsState {
         const action = incomingAction as KnownAction;
         switch (action.type) {
             case 'MyEvents.Create':
@@ -111,4 +108,4 @@ export class MyEventsReduxService {
     }
 }
 
-DIContainer.register(MyEventsReduxService);
+DIContainer.register(MyEventsReduxController);
