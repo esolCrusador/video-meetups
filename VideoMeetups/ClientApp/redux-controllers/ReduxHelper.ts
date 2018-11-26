@@ -3,7 +3,7 @@ import { IReduxController } from "./IReduxController";
 
 export class ReduxHelper {
     public static GetDispatchers<TController, TDispatchers>(service: TController, ...actions: (keyof TDispatchers)[]): { [action: string]: AppThunkAction<any> } {
-        const resultObject = {} as { [action: string]: AppThunkAction<any> };
+        const resultObject = {} as { [action in keyof TDispatchers]: AppThunkAction<any> };
         for (const action of actions) {
             resultObject[action] = function () {
                 const forwardArguments = new Array(arguments.length + 2);
