@@ -41,7 +41,7 @@
     "webpack": "2.5.1",
     "webpack-hot-middleware": "2.18.2",
     "webpack-merge": "4.1.0",
-    "moment": "2.22.2",
+    "moment": "2.29.4",
     "react-datepicker": "1.6.0",
     "injection-js": "2.2.1",
     "reflect-metadata": "0.1.12"
